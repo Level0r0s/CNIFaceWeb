@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
           blankTarget: true,
         },
         {
-          key: 'CNIFace',
+          key: 'coconut-island',
           title: <img src='/coconit-island-alpha-20x20.png'/>,
           href: 'https://github.com/coconut-island',
           blankTarget: true,

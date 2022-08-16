@@ -3,10 +3,12 @@ import RightContent from '@/components/RightContent';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
-import type { RunTimeLayoutConfig } from 'umi';
+import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history, Link } from 'umi';
 import defaultSettings from '../config/defaultSettings';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import { currentUser as queryCurrentUser } from './services/cniface/api';
+import { getToken } from '@/utils/index'
+import { notification } from 'antd';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -28,7 +30,7 @@ export async function getInitialState(): Promise<{
   const fetchUserInfo = async () => {
     try {
       const msg = await queryCurrentUser();
-      return msg.data;
+      return msg.result;
     } catch (error) {
       history.push(loginPath);
     }
@@ -55,13 +57,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      content: initialState?.currentUser?.username,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      if (!getToken() || !initialState?.currentUser && location.pathname !== loginPath) {
         history.push(loginPath);
       }
     },
@@ -104,4 +106,54 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     ...initialState?.settings,
   };
+};
+
+
+
+
+const requestInterceptors = (url: string, options: any) => {
+  if (getToken()) {
+    options.headers['Authorization'] = getToken()
+  }
+  return {
+    url,
+    options: { ...options }
+  }
+};
+
+// const responseInterceptors = async (response: Response, options: any) => {
+// async function responseInterceptors(response: Response, options: any) {
+//   const disposition = response.headers.get("Content-Disposition"); // 获取Content-Disposition
+//   if (disposition) {
+//     return {
+//       blob: await response.blob(), // 将二进制的数据转为blob对象，这一步是异步的因此使用async/await
+//       fileName: decodeURI(disposition.split(";")[1].split("filename*=")[1]), // 处理Content-Disposition，获取header中的文件名
+//     }
+//   }
+//   // const result = await response.clone().json();
+//   // if (result.hasOwnProperty('rtn') && result.rtn === -18000) {
+//   //   if (!history) return response;
+//   //   // 会话过期 跳转到登录页面
+//   //   setTimeout(() => {
+//   //     history.push(loginPath);
+//   //   }, 10);
+//   // }
+//   return response;
+// }
+
+export const request: RequestConfig = {
+  errorHandler: (error: any) => {
+    const { response } = error;
+    if (!response) {
+      notification.error({
+        description: '您的网络发生异常，无法连接服务器',
+        message: '网络异常',
+      });
+    }
+    throw error;
+  },
+  // 添加请求拦截器
+  requestInterceptors: [requestInterceptors],
+  // 添加请求返回拦截器
+  // responseInterceptors: [responseInterceptors]
 };

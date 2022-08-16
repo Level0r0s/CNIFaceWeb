@@ -1,5 +1,5 @@
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
+import { login } from '@/services/cniface/api';
 import {
   LockOutlined,
   UserOutlined,
@@ -12,6 +12,7 @@ import { Alert, message } from 'antd';
 import React, { useState } from 'react';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 import styles from './index.less';
+import { setToken } from "@/utils";
 
 const LoginMessage: React.FC<{
   content: string;
@@ -27,7 +28,7 @@ const LoginMessage: React.FC<{
 );
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [ userLoginState, setUserLoginState ] = useState<API.LoginResponse>({code: 0, message: "ok", result: {token: ""}});
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const intl = useIntl();
@@ -45,12 +46,13 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const msg = await login({ ...values });
-      if (msg.status === 'ok') {
+      const response = await login({ ...values });
+      if (response.code === 0) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
+        setToken(response.result.token);
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         /** 此方法会跳转到 redirect 参数所在的位置 */
@@ -60,9 +62,9 @@ const Login: React.FC = () => {
         history.push(redirect || '/');
         return;
       }
-      console.log(msg);
+      console.log(response);
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      setUserLoginState(response);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -72,7 +74,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const { status } = userLoginState;
+  const { code } = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -94,7 +96,7 @@ const Login: React.FC = () => {
           }}
         >
 
-          {status === 'error' && (
+          {code !== 0 && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
