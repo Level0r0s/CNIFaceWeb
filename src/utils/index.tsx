@@ -1,4 +1,3 @@
-
 const TOKEN_KEY = "WEBSITE-TOKEN"
 
 export function getToken() {

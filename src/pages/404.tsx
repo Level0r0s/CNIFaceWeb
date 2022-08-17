@@ -4,9 +4,10 @@ import { history } from 'umi';
 
 const NoFoundPage: React.FC = () => (
   <Result
-    status="404"
+    // status="404"
     title="404"
     subTitle="Sorry, the page you visited does not exist."
+    icon={<img style={{height: '40vh'}} src='/icons/coconit-island-alpha-512x512.png'/>}
     extra={
       <Button type="primary" onClick={() => history.push('/')}>
         Back Home

@@ -1,23 +1,14 @@
 ﻿export default [
   {
-    path: '/user',
+    path: '/login',
     layout: false,
-    routes: [
-      {
-        name: 'login',
-        path: '/user/login',
-        component: './user/Login',
-      },
-      {
-        component: './404',
-      },
-    ],
+    component: './Login',
   },
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
+    path: '/face_comparison',
+    name: 'face_comparison',
+    icon: 'team',
+    component: './FaceComparison',
   },
   // {
   //   path: '/admin',
@@ -44,7 +35,7 @@
   // },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/face_comparison',
   },
   {
     component: './404',

@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
         },
         {
           key: 'coconut-island',
-          title: <img src='/coconit-island-alpha-20x20.png'/>,
+          title: <img src='/img/coconit-island-alpha-20x20.png'/>,
           href: 'https://github.com/coconut-island',
           blankTarget: true,
         },
