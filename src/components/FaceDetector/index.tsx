@@ -1,17 +1,25 @@
-import { useState, useCallback, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 // import cx from 'classnames';
 // import { useIntl } from 'umi';
 import styles from './index.less';
 
-const FaceDetector: React.FC = (
+export type FaceDetectorProps = {
+  imgBase64?: string;
+  base64CallBack?: (base64: string) => void;
+};
 
-) => {
-  const [faceBase64, setFaceBase64] = useState("");
+const FaceDetector: React.FC<FaceDetectorProps> = ({
+  imgBase64,
+  base64CallBack = () => {},
+}) => {
   const inputFile = useRef<HTMLInputElement>(null);
 
   const uploadImg = useCallback(
     (file: File) => {
       new Promise(resolve => {
+        if (!(file instanceof File)) {
+          return;
+        }
         const fileReader = new FileReader();
         fileReader.readAsDataURL(file);
         fileReader.onload = () => {
@@ -22,11 +30,11 @@ const FaceDetector: React.FC = (
           resolve("");
         }
       }).then((imgUri: any) => {
-        const imgBase64 = imgUri.replace(/^data:image\/\w+;base64,/, "");
-        setFaceBase64(imgBase64);
+        const _imgBase64 = imgUri.replace(/^data:image\/\w+;base64,/, "");
+        base64CallBack(_imgBase64);
       })
     },
-    []
+    [base64CallBack]
   )
 
   const onClick = useCallback(
@@ -46,6 +54,7 @@ const FaceDetector: React.FC = (
       let files = [...e.target.files]; 
       files = files.slice(0, 1);
       uploadImg(files[0]);
+      e.target.value = '';
     },
     [uploadImg]
   )
@@ -83,7 +92,7 @@ const FaceDetector: React.FC = (
       type="file" 
     />
     <img 
-      className={styles.img} src={faceBase64 ? `data:image/png;base64,${faceBase64}` : '/img/default-avator-128x128.png'} 
+      className={styles.img} src={imgBase64 ? `data:image/png;base64,${imgBase64}` : '/img/default-avator-128x128.png'} 
     />
     
   </div>)

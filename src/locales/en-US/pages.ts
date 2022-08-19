@@ -9,4 +9,6 @@ export default {
   'pages.login.password.placeholder': 'Password',
   'pages.login.password.required': 'Please input your password!',
   'pages.login.submit': 'Login',
+
+  'pages.face_comparison.comparison_button': 'Comparison',
 };

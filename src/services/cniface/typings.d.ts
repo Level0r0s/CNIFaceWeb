@@ -2,11 +2,24 @@
 /* eslint-disable */
 
 declare namespace API {
+
+  type PageParams = {
+    current?: number;
+    pageSize?: number;
+  };
+
   type CNIFaceResponse<T> = {
     code: number;
     message: string;
     result: T;
+    total?: number; 
   }
+
+  type ErrorResponse = {
+    errorCode: string;
+    errorMessage?: string;
+    success?: boolean;
+  };
 
   type CurrentUser = {
     username: string;
@@ -15,6 +28,12 @@ declare namespace API {
 
   type CurrentUserResponse = CNIFaceResponse<CurrentUser>;
 
+  type LoginParams = {
+    username?: string;
+    password?: string;
+    rememberMe?: boolean;
+  };
+
   type LoginResult = {
     token: string;
     authorities?: string[];
@@ -22,72 +41,41 @@ declare namespace API {
 
   type LoginResponse = CNIFaceResponse<LoginResult>;
 
-  type PageParams = {
-    current?: number;
-    pageSize?: number;
-  };
+  type FaceDetectParams = {
+    faceImageBase64: string;
+    score: number;
+  } 
 
-  type RuleListItem = {
-    key?: number;
-    disabled?: boolean;
-    href?: string;
-    avatar?: string;
-    name?: string;
-    owner?: string;
-    desc?: string;
-    callNo?: number;
-    status?: number;
-    updatedAt?: string;
-    createdAt?: string;
-    progress?: number;
-  };
+  type FaceDetectResult = {
+    score: number;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    kps: number[];
+  }
 
-  type RuleList = {
-    data?: RuleListItem[];
-    /** 列表的内容总数 */
-    total?: number;
-    success?: boolean;
-  };
+  type FaceDetectResponse = CNIFaceResponse<FaceDetectResult[]>;
 
-  type FakeCaptcha = {
-    code?: number;
-    status?: string;
-  };
+  type ExtractFeatureParams = {
+    faceImageBase64: string;
+    kps?: number[]; 
+  }
 
-  type LoginParams = {
-    username?: string;
-    password?: string;
-    rememberMe?: boolean;
-  };
+  type ExtractFeatureResult = {
+    feature: number[];
+  }
 
-  type ErrorResponse = {
-    /** 业务约定的错误码 */
-    errorCode: string;
-    /** 业务上的错误信息 */
-    errorMessage?: string;
-    /** 业务上的请求是否成功 */
-    success?: boolean;
-  };
+  type ExtractFeatureResponse = CNIFaceResponse<ExtractFeatureResult>;
 
-  type NoticeIconList = {
-    data?: NoticeIconItem[];
-    /** 列表的内容总数 */
-    total?: number;
-    success?: boolean;
-  };
+  type SimilarityParams = {
+    feature1: number[];
+    feature2: number[];
+  }
 
-  type NoticeIconItemType = 'notification' | 'message' | 'event';
-
-  type NoticeIconItem = {
-    id?: string;
-    extra?: string;
-    key?: string;
-    read?: boolean;
-    avatar?: string;
-    title?: string;
-    status?: string;
-    datetime?: string;
-    description?: string;
-    type?: NoticeIconItemType;
-  };
+  type SimilarityResult = {
+    similarity: number;
+  }
+  
+  type SimilarityResponse = CNIFaceResponse<SimilarityResult>;
 }

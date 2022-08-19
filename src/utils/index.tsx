@@ -1,13 +1,17 @@
 const TOKEN_KEY = "WEBSITE-TOKEN"
 
-export function getToken() {
+export const getToken = () => {
   return localStorage.getItem(TOKEN_KEY)
 }
 
-export function setToken(token: string) {
+export const setToken = (token: string) => {
   localStorage.setItem(TOKEN_KEY, token)
 }
 
-export function removeToken() {
+export const removeToken = () => {
   localStorage.removeItem(TOKEN_KEY)
+}
+
+export const cutImgBase64Prefix = (imageBase64: string) => {
+  return imageBase64.replace(/^data:.*?;base64,/, '');
 }

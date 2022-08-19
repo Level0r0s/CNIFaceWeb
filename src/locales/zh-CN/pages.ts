@@ -9,4 +9,6 @@ export default {
   'pages.login.password.placeholder': '密码',
   'pages.login.password.required': '密码是必填项！',
   'pages.login.submit': '登录',
+
+  'pages.face_comparison.comparison_button': '比对',
 };
