@@ -36,9 +36,8 @@ const FaceComparison: React.FC = () => {
     async (imgBase64, id) => {
       const response = await faceDetect({
         faceImageBase64: imgBase64,
-        score: 0.5,
+        score: 0.4,
       });
-      console.log(response);
       if (response.code !== 0) {
         console.error(response.message);
         return;
@@ -78,6 +77,7 @@ const FaceComparison: React.FC = () => {
             faceImageBase64: imgBase64,
             kps: face.kps
           });
+          console.log(cutImgBase64Prefix(imgUri))
           if (id == 1) {
             setFeature1(extractFeatureResponse.result.feature);
             setImgBase64_1(cutImgBase64Prefix(imgUri));
@@ -131,7 +131,6 @@ const FaceComparison: React.FC = () => {
 
   const onSelectRectClick = useCallback(
     async (selectRect) => {
-      console.log(selectRect)
       const { face, detectorId } = selectRect;
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
