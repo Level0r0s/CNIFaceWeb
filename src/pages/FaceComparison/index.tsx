@@ -1,5 +1,5 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { message, Button } from 'antd';
+import { message, Button, Slider } from 'antd';
 import { useCallback, useState } from 'react';
 import { useIntl } from 'umi';
 import { faceDetect, extractFeature, similarity } from '@/services/cniface/api';
@@ -32,11 +32,13 @@ const FaceComparison: React.FC = () => {
   const [feature1, setFeature1] = useState([] as number[]);
   const [feature2, setFeature2] = useState([] as number[]);
 
+  const [faceScoreThreshold, setFaceScoreThreshold] = useState(0.5);
+
   const faceDetectorCallback = useCallback(
     async (imgBase64, id) => {
       const response = await faceDetect({
         faceImageBase64: imgBase64,
-        score: 0.4,
+        score: faceScoreThreshold,
       });
       if (response.code !== 0) {
         console.error(response.message);
@@ -68,6 +70,12 @@ const FaceComparison: React.FC = () => {
           canvas.height = face.h;
           ctx.drawImage(image, face.x, face.y, face.w, face.h, 0, 0, face.w, face.h);
           const kp = face.kps;
+
+          ctx.font = `bold ${face.w / 5}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'red';
+          ctx.fillText(face.score.toFixed(4).toString(), face.w / 2, face.w / 5);
+
           for (let i = 0; i < 10; i += 2) {
             ctx.fillStyle = 'red';
             ctx.fillRect(kp[i] - face.x, kp[i + 1] - face.y, 3, 3)
@@ -77,7 +85,6 @@ const FaceComparison: React.FC = () => {
             faceImageBase64: imgBase64,
             kps: face.kps
           });
-          console.log(cutImgBase64Prefix(imgUri))
           if (id == 1) {
             setFeature1(extractFeatureResponse.result.feature);
             setImgBase64_1(cutImgBase64Prefix(imgUri));
@@ -109,6 +116,12 @@ const FaceComparison: React.FC = () => {
             detectorId: id,
           });
 
+
+          ctx.font = `bold ${face.w / 5}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'red';
+          ctx.fillText(face.score.toFixed(4).toString(), face.x + (face.w / 2), face.y + (face.w / 5));
+
           ctx.lineWidth = 1;
           ctx.strokeStyle = "green";
           ctx.rect(face.x, face.y, face.w, face.h);
@@ -126,7 +139,7 @@ const FaceComparison: React.FC = () => {
         setForSelectImgBase64(cutImgBase64Prefix(imgUri));
       }
     },
-    [intl]
+    [faceScoreThreshold, intl]
   )
 
   const onSelectRectClick = useCallback(
@@ -139,11 +152,17 @@ const FaceComparison: React.FC = () => {
         return;
       };
       const image = new Image();
-      image.src = `data:image/png;base64,${forSelectImgBase64}`;
+      image.src = `data:image/png;base64,${sourceImgBase64}`;
       image.crossOrigin = 'anonymous';
       canvas.width = face.w;
       canvas.height = face.h;
       ctx.drawImage(image, face.x, face.y, face.w, face.h, 0, 0, face.w, face.h);
+
+      ctx.font = `bold ${face.w / 5}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'red';
+      ctx.fillText(face.score.toFixed(4).toString(), face.w / 2, face.w / 5);
+
       const kp = face.kps;
       for (let i = 0; i < 10; i += 2) {
         ctx.fillStyle = 'red';
@@ -165,7 +184,7 @@ const FaceComparison: React.FC = () => {
       setSelectRects([]);
       setForSelectImgBase64("");
     },
-    [forSelectImgBase64, sourceImgBase64]
+    [sourceImgBase64]
   )
 
   const doRecognition = useCallback(
@@ -181,6 +200,13 @@ const FaceComparison: React.FC = () => {
       setSimilarityValue(response.result.similarity.toFixed(2).toString().padStart(5, '0'));
     },
     [feature1, feature2]
+  )
+
+  const onFaceScoreThresholdSliderChange = useCallback(
+    (newValue: number) => {
+      setFaceScoreThreshold(newValue);
+    },
+    []
   )
 
   return (
@@ -232,6 +258,20 @@ const FaceComparison: React.FC = () => {
             }}
           />
         </div>
+      </div>
+      <div className={styles.faceScoreThresholdSliderWrapper}>
+        <Slider 
+          className={styles.faceScoreThresholdSlider}
+          min={0}
+          max={1}
+          step={0.1}
+          value={faceScoreThreshold}
+          onChange={onFaceScoreThresholdSliderChange}
+          tipFormatter={(value) => `${intl.formatMessage({
+            id: 'pages.face_comparison.faceScoreThresholdSliderTipPrefix',
+            defaultMessage: '人脸检测可置信阈值：',
+          })} ${value}`.toString()}
+        />
       </div>
     </PageContainer>
   );

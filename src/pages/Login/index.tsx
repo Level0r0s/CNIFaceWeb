@@ -1,5 +1,5 @@
 import Footer from '@/components/Footer';
-import { login } from '@/services/cniface/api';
+import { login, initAndRegisterAdmin } from '@/services/cniface/api';
 import {
   LockOutlined,
   UserOutlined,
@@ -8,7 +8,7 @@ import {
   LoginForm,
   ProFormText,
 } from '@ant-design/pro-components';
-import { Alert, message } from 'antd';
+import { Alert, Modal, message, Button, Form, Input } from 'antd';
 import React, { useState } from 'react';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 import styles from './index.less';
@@ -30,6 +30,7 @@ const LoginMessage: React.FC<{
 const Login: React.FC = () => {
   const [ userLoginState, setUserLoginState ] = useState<API.LoginResponse>({code: 0, message: "ok", result: {token: ""}});
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [ showInitAndRegiterAdminModal, setShowInitAndRegiterAdminModal ] = useState<boolean>(false);
 
   const intl = useIntl();
 
@@ -47,6 +48,16 @@ const Login: React.FC = () => {
     try {
       // 登录
       const response = await login({ ...values });
+
+      if (response.code === -10) {
+        message.warn(intl.formatMessage({
+          id: 'pages.login.unInit',
+          defaultMessage: '应用尚未初始化，请先注册admin账号！',
+        }));
+        setShowInitAndRegiterAdminModal(true);
+        return;
+      }
+
       if (response.code === 0) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
@@ -62,7 +73,6 @@ const Login: React.FC = () => {
         history.push(redirect || '/');
         return;
       }
-      console.log(response);
       // 如果失败去设置用户错误信息
       setUserLoginState(response);
     } catch (error) {
@@ -72,6 +82,39 @@ const Login: React.FC = () => {
       });
       message.error(defaultLoginFailureMessage);
     }
+  };
+
+  const handleInitAndRegisterAdminOk = () => {
+    setShowInitAndRegiterAdminModal(false);
+  };
+
+  const handleInitAndRegisterAdminCancel = () => {
+    setShowInitAndRegiterAdminModal(false);
+  };
+
+  const onInitAndRegisterAdminFinish = async (values: any) => {
+    const { password } = values;
+    const response = await initAndRegisterAdmin({password});
+    if (response.code === 0) {
+      message.success(
+        intl.formatMessage({
+          id: 'pages.login.initAndRegisterAdminSubmit.success',
+          defaultMessage: '初始化以及注册成功',
+        })
+      );
+      setShowInitAndRegiterAdminModal(false);
+    } else {
+      message.error(
+        intl.formatMessage({
+          id: 'pages.login.initAndRegisterAdminSubmit.fail',
+          defaultMessage: '初始化以及注册失败',
+        })
+      );
+    }
+  };
+
+  const onInitAndRegisterAdminFinishFailed = (errorInfo: any) => {
+    console.error('Failed:', errorInfo);
   };
 
   const { code } = userLoginState;
@@ -150,6 +193,65 @@ const Login: React.FC = () => {
           />
         </LoginForm>
       </div>
+      <Modal
+        title={
+          intl.formatMessage({
+            id: 'pages.login.adminRegisterModelTitle',
+            defaultMessage: 'admin账号注册',
+          })
+        }
+        visible={showInitAndRegiterAdminModal}
+        onOk={handleInitAndRegisterAdminOk}
+        onCancel={handleInitAndRegisterAdminCancel}
+        closable={false}
+        keyboard={false}
+        maskClosable={false}
+        footer={null}
+      >
+        <Form
+          name="basic"
+          onFinish={onInitAndRegisterAdminFinish}
+          onFinishFailed={onInitAndRegisterAdminFinishFailed}
+          autoComplete="off"
+        >
+          <Form.Item
+            wrapperCol={{ offset: 4, span: 16 }}
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: (
+                  <FormattedMessage
+                    id="pages.login.password.required"
+                    defaultMessage="请输入密码！"
+                  />
+                ),
+              },
+            ]}
+          >
+            <Input.Password
+              prefix={
+                <LockOutlined className={styles.prefixIcon} />
+              }
+              placeholder={intl.formatMessage({
+                id: 'pages.login.password.placeholder',
+                defaultMessage: '密码',
+              })}
+            />
+          </Form.Item>
+
+          <Form.Item wrapperCol={{ offset: 10 }}>
+            <Button type={'ghost'} htmlType="submit">
+              {
+                intl.formatMessage({
+                  id: 'pages.login.adminRegisterModelOkButton',
+                  defaultMessage: '提交',
+                })
+              }
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
       <Footer />
     </div>
   );

@@ -9,6 +9,12 @@ export default {
   'pages.login.password.placeholder': '密码',
   'pages.login.password.required': '密码是必填项！',
   'pages.login.submit': '登录',
-
+  'pages.login.unInit': '应用尚未初始化，请先注册admin账号！',
+  'pages.login.adminRegisterModelTitle': 'admin账号注册',
+  'pages.login.adminRegisterModelOkButton': '提交',
+  'pages.login.initAndRegisterAdminSubmit.success': '初始化以及注册成功',
+  'pages.login.initAndRegisterAdminSubmit.fail': '初始化以及注册失败',
+  
   'pages.face_comparison.comparison_button': '比对',
+  'pages.face_comparison.faceScoreThresholdSliderTipPrefix': '人脸检测可置信阈值：',
 };

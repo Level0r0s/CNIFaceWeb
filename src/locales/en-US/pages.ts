@@ -9,6 +9,12 @@ export default {
   'pages.login.password.placeholder': 'Password',
   'pages.login.password.required': 'Please input your password!',
   'pages.login.submit': 'Login',
+  'pages.login.unInit': 'The application has not been initialized, please register the admin account first!',
+  'pages.login.adminRegisterModelTitle': 'Admin Account Registration',
+  'pages.login.adminRegisterModelOkButton': 'submit',
+  'pages.login.initAndRegisterAdminSubmit.success': 'Initialization and registration succeeded',
+  'pages.login.initAndRegisterAdminSubmit.fail': 'Initialization and registration failed',
 
   'pages.face_comparison.comparison_button': 'Comparison',
+  'pages.face_comparison.faceScoreThresholdSliderTipPrefix': 'Face detection confidence threshold:',
 };

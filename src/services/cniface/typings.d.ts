@@ -78,4 +78,10 @@ declare namespace API {
   }
   
   type SimilarityResponse = CNIFaceResponse<SimilarityResult>;
+
+  type InitAndRegisterAdminParams = {
+    password: string;
+  }
+
+  type InitAndRegisterAdminResponse = CNIFaceResponse;
 }

@@ -52,3 +52,14 @@ export async function similarity(body: API.SimilarityParams, options?: { [key: s
     ...(options || {}),
   });
 }
+
+export async function initAndRegisterAdmin(body: API.InitAndRegisterAdminParams, options?: { [key: string]: any }) {
+  return request<API.InitAndRegisterAdminResponse>('/api/init_and_register_admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
