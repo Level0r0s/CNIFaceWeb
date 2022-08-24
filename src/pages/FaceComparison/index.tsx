@@ -154,35 +154,37 @@ const FaceComparison: React.FC = () => {
       const image = new Image();
       image.src = `data:image/png;base64,${sourceImgBase64}`;
       image.crossOrigin = 'anonymous';
-      canvas.width = face.w;
-      canvas.height = face.h;
-      ctx.drawImage(image, face.x, face.y, face.w, face.h, 0, 0, face.w, face.h);
-
-      ctx.font = `bold ${face.w / 5}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'red';
-      ctx.fillText(face.score.toFixed(4).toString(), face.w / 2, face.w / 5);
-
-      const kp = face.kps;
-      for (let i = 0; i < 10; i += 2) {
+      image.onload = async () => {
+        canvas.width = face.w;
+        canvas.height = face.h;
+        ctx.drawImage(image, face.x, face.y, face.w, face.h, 0, 0, face.w, face.h);
+  
+        ctx.font = `bold ${face.w / 5}px sans-serif`;
+        ctx.textAlign = 'center';
         ctx.fillStyle = 'red';
-        ctx.fillRect(kp[i] - face.x, kp[i + 1] - face.y, 3, 3)
+        ctx.fillText(face.score.toFixed(4).toString(), face.w / 2, face.w / 5);
+  
+        const kp = face.kps;
+        for (let i = 0; i < 10; i += 2) {
+          ctx.fillStyle = 'red';
+          ctx.fillRect(kp[i] - face.x, kp[i + 1] - face.y, 3, 3)
+        }
+        const imgUri = canvas.toDataURL('image/png');
+        const extractFeatureResponse = await extractFeature({
+          faceImageBase64: sourceImgBase64,
+          kps: face.kps
+        });
+        if (detectorId == 1) {
+          setFeature1(extractFeatureResponse.result.feature);
+          setImgBase64_1(cutImgBase64Prefix(imgUri));
+        }
+        if (detectorId == 2) {
+          setFeature2(extractFeatureResponse.result.feature);
+          setImgBase64_2(cutImgBase64Prefix(imgUri));
+        }
+        setSelectRects([]);
+        setForSelectImgBase64("");
       }
-      const imgUri = canvas.toDataURL('image/png');
-      const extractFeatureResponse = await extractFeature({
-        faceImageBase64: sourceImgBase64,
-        kps: face.kps
-      });
-      if (detectorId == 1) {
-        setFeature1(extractFeatureResponse.result.feature);
-        setImgBase64_1(cutImgBase64Prefix(imgUri));
-      }
-      if (detectorId == 2) {
-        setFeature2(extractFeatureResponse.result.feature);
-        setImgBase64_2(cutImgBase64Prefix(imgUri));
-      }
-      setSelectRects([]);
-      setForSelectImgBase64("");
     },
     [sourceImgBase64]
   )
