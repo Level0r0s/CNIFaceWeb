@@ -262,8 +262,8 @@ const FaceComparison: React.FC = () => {
       <div className={styles.faceScoreThresholdSliderWrapper}>
         <Slider 
           className={styles.faceScoreThresholdSlider}
-          min={0}
-          max={1}
+          min={0.1}
+          max={0.9}
           step={0.1}
           value={faceScoreThreshold}
           onChange={onFaceScoreThresholdSliderChange}
