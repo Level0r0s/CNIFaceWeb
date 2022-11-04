@@ -7,8 +7,18 @@
   {
     path: '/face_comparison',
     name: 'face_comparison',
-    icon: 'team',
+    icon: 'OneToOne',
     component: './FaceComparison',
+  },
+  {
+    path: '/repository',
+    name: 'repository',
+    icon: 'team',
+    component: './Repository',
+  },
+  {
+    path: '/repo_item',
+    component: './RepoItem',
   },
   // {
   //   path: '/admin',
@@ -26,12 +36,6 @@
   //       component: './404',
   //     },
   //   ],
-  // },
-  // {
-  //   name: 'list.table-list',
-  //   icon: 'table',
-  //   path: '/list',
-  //   component: './TableList',
   // },
   {
     path: '/',

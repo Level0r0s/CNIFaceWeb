@@ -1,5 +1,5 @@
 import Footer from '@/components/Footer';
-import { login, initAndRegisterAdmin } from '@/services/cniface/api';
+import { loginAPI, initAndRegisterAdminAPI } from '@/services/cniface/api';
 import {
   LockOutlined,
   UserOutlined,
@@ -47,7 +47,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const response = await login({ ...values });
+      const response = await loginAPI({ ...values });
 
       if (response.code === -10) {
         message.warn(intl.formatMessage({
@@ -94,7 +94,7 @@ const Login: React.FC = () => {
 
   const onInitAndRegisterAdminFinish = async (values: any) => {
     const { password } = values;
-    const response = await initAndRegisterAdmin({password});
+    const response = await initAndRegisterAdminAPI({password});
     if (response.code === 0) {
       message.success(
         intl.formatMessage({

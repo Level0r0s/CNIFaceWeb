@@ -2,19 +2,12 @@ import { PageContainer } from '@ant-design/pro-components';
 import { message, Button, Slider } from 'antd';
 import { useCallback, useState } from 'react';
 import { useIntl } from 'umi';
-import { faceDetect, extractFeature, similarity } from '@/services/cniface/api';
+import { faceDetectAPI, extractFeatureAPI, similarityAPI } from '@/services/cniface/api';
 import { cutImgBase64Prefix } from '@/utils';
+import type { SelectRect } from './data';
 import styles from './index.less';
 
 import FaceDetector from '@/components/FaceDetector';
-
-type SelectRect = {
-  id: number;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
 
 const FaceComparison: React.FC = () => {
   const intl = useIntl();
@@ -36,9 +29,10 @@ const FaceComparison: React.FC = () => {
 
   const faceDetectorCallback = useCallback(
     async (imgBase64, id) => {
-      const response = await faceDetect({
+      const response = await faceDetectAPI({
         faceImageBase64: imgBase64,
         score: faceScoreThreshold,
+        isReturnRecognitionSubImage: false,
       });
       if (response.code !== 0) {
         console.error(response.message);
@@ -81,7 +75,7 @@ const FaceComparison: React.FC = () => {
             ctx.fillRect(kp[i] - face.x, kp[i + 1] - face.y, 3, 3)
           }
           const imgUri = canvas.toDataURL('image/png');
-          const extractFeatureResponse = await extractFeature({
+          const extractFeatureResponse = await extractFeatureAPI({
             faceImageBase64: imgBase64,
             kps: face.kps
           });
@@ -170,7 +164,7 @@ const FaceComparison: React.FC = () => {
           ctx.fillRect(kp[i] - face.x, kp[i + 1] - face.y, 3, 3)
         }
         const imgUri = canvas.toDataURL('image/png');
-        const extractFeatureResponse = await extractFeature({
+        const extractFeatureResponse = await extractFeatureAPI({
           faceImageBase64: sourceImgBase64,
           kps: face.kps
         });
@@ -191,7 +185,7 @@ const FaceComparison: React.FC = () => {
 
   const doRecognition = useCallback(
     async () => {
-      const response = await similarity({
+      const response = await similarityAPI({
         feature1,
         feature2,
       });

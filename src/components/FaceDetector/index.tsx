@@ -1,15 +1,17 @@
 import { useCallback, useRef } from 'react'
-// import cx from 'classnames';
-// import { useIntl } from 'umi';
 import styles from './index.less';
 
 export type FaceDetectorProps = {
   imgBase64?: string;
+  width?: string;
+  height?: string;
   base64CallBack?: (base64: string) => void;
 };
 
 const FaceDetector: React.FC<FaceDetectorProps> = ({
   imgBase64,
+  width,
+  height,
   base64CallBack = () => {},
 }) => {
   const inputFile = useRef<HTMLInputElement>(null);
@@ -77,6 +79,7 @@ const FaceDetector: React.FC<FaceDetectorProps> = ({
   return (
   <div
     className={styles.wrapper}
+    style={{width, height}}
     role="button"
     onDrop={onFileDrop}
     onDragOver={onFileDrop}

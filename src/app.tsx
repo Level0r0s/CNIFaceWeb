@@ -6,7 +6,7 @@ import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history, Link } from 'umi';
 import defaultSettings from '../config/defaultSettings';
-import { currentUser as queryCurrentUser } from './services/cniface/api';
+import { currentUserAPI } from './services/cniface/api';
 import { getToken } from '@/utils/index'
 import { notification } from 'antd';
 
@@ -29,7 +29,7 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const msg = await queryCurrentUser();
+      const msg = await currentUserAPI();
       return msg.result;
     } catch (error) {
       history.push(loginPath);
@@ -113,7 +113,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 
 const requestInterceptors = (url: string, options: any) => {
   if (getToken()) {
-    options.headers['Authorization'] = getToken()
+    options.headers.Authorization = getToken()
   }
   return {
     url,
@@ -121,25 +121,30 @@ const requestInterceptors = (url: string, options: any) => {
   }
 };
 
-// const responseInterceptors = async (response: Response, options: any) => {
-// async function responseInterceptors(response: Response, options: any) {
-//   const disposition = response.headers.get("Content-Disposition"); // 获取Content-Disposition
-//   if (disposition) {
-//     return {
-//       blob: await response.blob(), // 将二进制的数据转为blob对象，这一步是异步的因此使用async/await
-//       fileName: decodeURI(disposition.split(";")[1].split("filename*=")[1]), // 处理Content-Disposition，获取header中的文件名
-//     }
-//   }
-//   // const result = await response.clone().json();
-//   // if (result.hasOwnProperty('rtn') && result.rtn === -18000) {
-//   //   if (!history) return response;
-//   //   // 会话过期 跳转到登录页面
-//   //   setTimeout(() => {
-//   //     history.push(loginPath);
-//   //   }, 10);
-//   // }
-//   return response;
-// }
+const responseInterceptors = async (response: Response) => {
+  // const disposition = response.headers.get("Content-Disposition"); // 获取Content-Disposition
+  // if (disposition) {
+    // return {
+    //   blob: await response.blob(),
+    //   fileName: decodeURI(disposition.split(";")[1].split("filename*=")[1]), // 处理Content-Disposition，获取header中的文件名
+    // }
+  // }
+  const result = await response.clone().json();
+  if (response.status == 500) {
+      notification.error({
+        message: '服务器端异常',
+        description: result.message,
+    });
+  }
+  // if (result.hasOwnProperty('code') && result.code === -18000) {
+  //   if (!history) return response;
+  //   // 会话过期 跳转到登录页面
+  //   setTimeout(() => {
+  //     history.push(loginPath);
+  //   }, 10);
+  // }
+  return response;
+}
 
 export const request: RequestConfig = {
   errorHandler: (error: any) => {
@@ -155,5 +160,5 @@ export const request: RequestConfig = {
   // 添加请求拦截器
   requestInterceptors: [requestInterceptors],
   // 添加请求返回拦截器
-  // responseInterceptors: [responseInterceptors]
+  responseInterceptors: [responseInterceptors]
 };
