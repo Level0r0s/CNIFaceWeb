@@ -92,8 +92,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
         
       - name: Get date time
-          id: date
-          run: echo "::set-output name=current_time::$(date +'%Y%m%d%H%M')"
+        id: date
+        run: echo "::set-output name=current_time::$(date +'%Y%m%d%H%M')"
 
       - name: Build and push
         uses: docker/build-push-action@v2
